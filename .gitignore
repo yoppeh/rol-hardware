@@ -1,0 +1,11 @@
+rol-backups
+.vscode
+.DS_Store
+*.sch-bak
+*.bck
+lcd-driver
+*.fus
+*.pin
+*.jed
+*.chp
+*.pxd

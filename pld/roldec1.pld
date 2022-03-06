@@ -1,0 +1,64 @@
+GAL22V10 ; The type of chip this is written to
+roldec.1 ; Up to 8 chars of descriptive text
+
+; These map the pins of the ATF22V10 to names. CLK is pin 1, going down then to
+; the right, then up to VCC as pin 24. So, GND is pin 12. A space between each 
+; label. NC is "NO CONNECT".
+CLK A15 A14 A13 A7 A6 A5 VDA VPA NC NC GND
+ NC  S0  S1  S2 S3 S4 S5  S6  S7 S8 S9 VCC
+
+; S0 - S9 are the 10 output pins provided by the chip. Each one will act as the
+; chip  select line for a different chip.
+; / = NOT
+; * = AND
+; + = OR 
+
+; With that, here is the actual decoding logic:
+
+; S0 is low (the "/") when A15 is low and the clock, VPA or VDA are high. This 
+; is main RAM at 0x0000 - 0x7fff.
+/S0 = /A15 * CLK * VDA
+    + /A15 * CLK * VPA
+
+; S1 is low when A15 is high, A14 is low and the clock, VPA or VDA are high. 
+; This is a 16K window for paging in extended RAM at 0x8000 - 0xbfff.
+/S1 = A15 * /A14 * CLK * VDA 
+    + A15 * /A14 * CLK * VPA
+
+; S2 is low when A15 and A14 are high and A13 is low and VPA or VDA are high. 
+; This is the first block of I/O at 0xc000 - 0xc01f.
+/S2 = A15 * A14 * /A13 * /A7 * /A6 * /A5 * VDA
+
+; S3 is low when A15 and A14 are high and A13, A7 and A6 are low and A5, VDA 
+; or VPA are high. This is the  2nd block of I/O at  0xc020 - 0xc03f.
+/S3 = A15 * A14 * /A13 * /A7 * /A6 * A5 * VDA
+
+; S4 is low when A15 and A14 are high and A13, A7 and A5 are low and A6, VPA 
+; or VDA are high. This is the 3rd block of I/O at 0xc040 - 0xc05f. 
+/S4 = A15 * A14 * /A13 * /A7 * A6 * /A5 * VDA
+
+; S5 is low when A15 and A14 are high and A13 and A7 are low and A6, A5, VDA 
+; or VPA are high. This is the 4th block of I/O at 0xc060 - 0xc07f.
+/S5 = A15 * A14 * /A13 * /A7 * A6 * A5 * VDA
+
+; S6 is low when A15 and A14 are high and A13, A6 and A5 are low and A7, VPA 
+; or VDA are high. This is the 5th block of I/O at 0xc080 - 0xc09f.
+/S6 = A15 * A14 * /A13 * A7 * /A6 * /A5 * VDA
+
+; S7 is low when A15 and A14 are high and A13 and A6 are low and A7, A5, VPA
+; or VDA are high. This is the 6th block of I/O at 0xc0a0 - 0xc0bf. This is 
+; mapped to the UART.
+/S7 = A15 * A14 * /A13 * A7 * /A6 * A5 * VDA
+
+; S8 is low when A15 and A14 are high and A13 and A5 are low and A7, A6 VPA and
+; VDA are high. This is the 7th block of I/O at 0xc0c0 - 0xc0df.
+/S8 = A15 * A14 * /A13 * A7 * A6 * /A5 * VDA
+
+; Finally, S9 is low when A15, A14, A13, VPA or VDA are all high. This is 8K 
+; eeprom at 0xe000 - 0xffff.
+/S9 = A15 * A14 * A13 * VDA
+    + A15 * A14 * A13 * VPA
+
+; Here is some descriptive, free-form text.
+DESCRIPTION
+Address decoding logic for ROL.

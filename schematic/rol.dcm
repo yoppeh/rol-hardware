@@ -1,0 +1,7 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP rolspi1
+D rol spi miso register
+$ENDCMP
+#
+#End Doc Library

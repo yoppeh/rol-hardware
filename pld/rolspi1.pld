@@ -1,0 +1,23 @@
+GAL22V10 ; The type of chip this is written to
+rolspi.1 ; Up to 8 chars of descriptive text
+
+; These map the pins of the ATF22V10 to names.
+; CLK is pin 1, going down then to the right,
+; then up to VCC as pin 24. So, GND is pin 12.
+; A space between each label. NC is "NO
+; CONNECT".
+CLK     RW       A4 A3 A2 A1 A0 VIA0SEL NC NC NC GND
+ NC MISOOE SRCLRSEL NC NC NC NC      NC NC NC NC VCC
+
+; / = NOT
+; * = AND
+; + = OR (not used here)
+
+; Output enable for the MISO shift register
+ /MISOOE = RW * A4 * /VIA0SEL
+
+; Assert /SRCLR when A0, A4 and RW are all high.
+/SRCLRSEL = RW * A0 * /A1 * /A2 * /A3 * A4 * /eVIA0SEL
+
+DESCRIPTION
+Control signals for the SPI MISO shift register on VIA #0.

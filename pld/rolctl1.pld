@@ -1,0 +1,41 @@
+GAL22V10 ; The type of chip this is written to
+rolctl.1 ; Up to 8 chars of descriptive text
+
+; These map the pins of the ATF22V10 to names.
+; CLK is pin 1, going down then to the right,
+; then up to VCC as pin 24. So, GND is pin 12.
+; A space between each label. NC is "NO
+; CONNECT".
+CLK    RW    RES RTCIRQ VIA0IRQ VIA1IRQ    NC NC UARTIRQ NC NC GND
+ NC RTCOE UARTWR UARTRD  UARTRS     IRQ RTCWE NC      NC NC NC VCC
+
+; / = NOT
+; * = AND
+; + = OR (not used here)
+
+; Real Time Clock Output Enable is the inverse
+; of the 65816 /RW
+ /RTCOE  = RW * CLK
+
+; Real Tine Clock Write Enable is the inverse
+; of the 65816 /RW ANDed with the clock, the
+; result of which is inverted for the output.
+/RTCWE = /RW * CLK
+
+; UART Write Enable is the 65816 /RW ANDed with
+; the clock
+/UARTWR = /RW * CLK
+
+; UART Read Enable is the 65816 /RW ANDed with 
+; the clock
+/UARTRD = RW * CLK
+
+; UART Reset is the inverse of the 65816 Reset
+UARTRS  = /RES
+
+; IRQ line to 65816 is the AND of all external 
+; chip IRQ lines
+IRQ = RTCIRQ * VIA0IRQ * VIA1IRQ * UARTIRQ
+
+DESCRIPTION
+Control signals and IRQ line for ROL.
